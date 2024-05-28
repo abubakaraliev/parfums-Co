@@ -1,17 +1,37 @@
-from sqlalchemy.orm import Session
+from typing import Optional
+import uuid
+from sqlalchemy.exc import IntegrityError
+from .schemas import UserCreate, UserInDB
+from users import auth_service
 from .models import User
 from app.database import SessionLocal
 
+def create_user(new_user: UserCreate) -> UserInDB:
+    new_password = auth_service.create_salt_and_hashed_password(plaintext_password=new_user.password)
+    new_user_params = new_user.dict()
+    new_user_params["id"] = str(uuid.uuid4())
+    new_user_params.update(new_password.dict())
+    new_user_updated = UserInDB(**new_user_params)
+    print(new_user_updated)
 
-def create_user(db: Session, username: str, email: str):
-    db_user = User(username=username, email=email)
-    db.add(db_user)
-    db.commit()
-    db.refresh(db_user)
-    return db_user
+    db = SessionLocal()
+    try:
+        db_user = User(**new_user_updated.dict())
+        db.add(db_user)
+        db.commit()
+        db.refresh(db_user)
+    except IntegrityError:
+        db.rollback()
+        raise ValueError("User with this email already exists.")
+    finally:
+        db.close()
 
+    return new_user_updated
 
-def get_user(db: Session, user_id: int):
-    return db.query(User).filter(User.id == user_id).first()
-
-db = SessionLocal()
+def get_user_by_username(username: str) -> Optional[UserInDB]:
+    db = SessionLocal()
+    user = db.query(User).filter(User.username == username).first()
+    db.close()
+    if user:
+        return UserInDB.from_orm(user)
+    return None
