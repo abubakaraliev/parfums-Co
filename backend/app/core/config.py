@@ -1,4 +1,4 @@
-
+import os
 from typing import Any, Dict, List, Optional, Union
 
 from pydantic import AnyHttpUrl, BaseSettings, validator
@@ -33,6 +33,7 @@ class Settings(BaseSettings):
     class Config:
         case_sensitive = True
         env_file = ".env"
+
         
     
     JWT_SETTINGS: Optional[Dict[str, Any]] = None

@@ -6,8 +6,6 @@ from typing import Optional
 from app.core.config import settings
 
 # JWT
-
-
 class JWTMeta(CoreModel):
     iss: str = "localhost"
     aud: str = settings.JWT_AUDIENCE
@@ -32,8 +30,6 @@ class AccessToken(CoreModel):
     token_type: str
 
 # USER
-
-
 def validate_username(username: str) -> str:
     allowed = string.ascii_letters + string.digits + "-" + "_"
     assert all(
