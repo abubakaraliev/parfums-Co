@@ -7,7 +7,7 @@ from app.core.config import settings
 from passlib.context import CryptContext  # type: ignore
 from .schemas import JWTCreds, JWTMeta, JWTPayload, TokenData, UserInDB, UserPasswordUpdate
 import bcrypt  # type: ignore
-import jwt  # type: ignore
+import jwt
 from jwt import ExpiredSignatureError, PyJWTError
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -23,7 +23,7 @@ class Authenticate:
 
     @staticmethod
     def generate_salt() -> str:
-        return bcrypt.gensalt().encode().decode()
+        return bcrypt.gensalt().decode()
 
     @staticmethod
     def hash_password(*, password: str, salt: str) -> str:

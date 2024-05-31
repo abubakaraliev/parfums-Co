@@ -1,6 +1,5 @@
 import sys, os
 from fastapi.staticfiles import StaticFiles
-from .database import Base, engine, get_db
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from users.api.controller import router as user_router

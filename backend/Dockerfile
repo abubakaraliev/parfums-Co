@@ -1,12 +1,25 @@
+# Use the latest stable version of the base image with Python 3.8
 FROM tiangolo/uvicorn-gunicorn-fastapi:python3.8
 
-ENV PYTHONPATH "${PYTHONPATH}:/"
+
+# Set environment variables
+ENV PYTHONPATH="${PYTHONPATH}:/"
 ENV PORT=8000
 
-RUN pip install --upgrade pip
+# Install system dependencies
+RUN apt-get update \
+    && apt-get install -y default-libmysqlclient-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-COPY ./requirements.txt /app/
+# Set up working directory
+WORKDIR /app
 
-RUN pip install -r requirements.txt
+# Install Python dependencies
+COPY requirements.txt requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
-COPY ./app /app
+# Copy the application code
+COPY . /app
+
+# Command to run the application
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
