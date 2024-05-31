@@ -2,11 +2,11 @@ from typing import Optional
 import uuid
 from sqlalchemy.exc import IntegrityError
 from .schemas import UserCreate, UserInDB
-from users import auth_service
 from .models import User
 from app.database import SessionLocal
 
 def create_user(new_user: UserCreate) -> UserInDB:
+    from users import auth_service
     new_password = auth_service.create_salt_and_hashed_password(plaintext_password=new_user.password)
     new_user_params = new_user.dict()
     new_user_params["id"] = str(uuid.uuid4())

@@ -1,4 +1,4 @@
-import sys
+import sys, os
 
 from logging.config import fileConfig
 
@@ -8,10 +8,12 @@ from sqlalchemy import pool
 from alembic import context
 
 from app.core.config import settings
-from app.main import db
+from app import database as db
 from users.models import User
+from product.models import Category, Product, Base
 
-sys.path.append('..')
+# Ensure the parent directory is in the system path for imports
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -29,7 +31,8 @@ if config.config_file_name is not None:
 # target_metadata = None
 
 config.set_main_option('sqlalchemy.url', settings.DATABASE_URI)
-target_metadata = db
+target_metadata = Base.metadata
+# config.set_main_option('sqlalchemy.url', f'mysql+pymysql://{settings.MYSQL_USER}:{settings.MYSQL_PASSWORD}@{settings.MYSQL_HOST}:{settings.MYSQL_PORT}/{settings.MYSQL_DATABASE}')
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

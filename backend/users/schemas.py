@@ -116,3 +116,7 @@ class UserLogin(CoreModel):
         elif len(password) > 100:
             raise ValueError("Password length cannot exceed 100 characters")
         return password
+
+# TOKEN
+class TokenData(CoreModel):
+    username: Optional[str] = None

@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Body, Depends, HTTPException
-from ..schemas import AccessToken, UserCreate, UserLogin, UserPublic
+from ..schemas import AccessToken, UserCreate, UserInDB, UserLogin, UserPublic
 from users import auth_service
 from users.crud import create_user, get_user_by_username
+from users.authentication import get_current_active_user
 
 router = APIRouter()
 
@@ -36,3 +37,12 @@ def user_login(user: UserLogin) -> UserPublic:
         return UserPublic(**found_user.dict(), access_token=access_token)
     else:
         raise HTTPException(status_code=400, detail="Invalid username or password")
+    
+@router.get(
+    "/me",
+    tags=["get current logged in user"],
+    description="Get current logged in user",
+    response_model=UserPublic,
+)
+def get_me(current_user: UserInDB = Depends(get_current_active_user)) -> UserInDB:
+    return current_user
