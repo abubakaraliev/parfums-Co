@@ -19,5 +19,7 @@ class Product(Base):
     slug = Column(String(length=255), unique=True, nullable=False)
     description = Column(String(length=255), nullable=True)
     price = Column(Numeric(precision=10, scale=2), nullable=False)
+    image = Column(String(length=255), nullable=True)
     thumbnail = Column(String(length=255), nullable=True)
-    date_added = Column(DateTime(), nullable=False)
+    created_at = Column(DateTime(), nullable=False)
+    updated_at = Column(DateTime(), nullable=False)
