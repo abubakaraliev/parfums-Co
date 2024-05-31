@@ -18,6 +18,7 @@ class ProductCreate(CoreModel, DateTimeModelMixin):
     slug: str
     description: Optional[str]
     price: float
+    image: Optional[str]
     thumbnail: Optional[str]
 
 
