@@ -11,6 +11,8 @@ from app.core.config import settings
 from app import database as db
 from users.models import User
 from product.models import Category, Product, Base
+from order.models import Order, OrderItem
+
 
 # Ensure the parent directory is in the system path for imports
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
