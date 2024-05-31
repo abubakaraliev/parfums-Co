@@ -27,25 +27,19 @@ async def category_create(category: CategoryCreate, db: Session = Depends(get_db
     response_model=ProductInDB,
     dependencies=[Depends(check_if_user_is_admin)]
 )
-async def product_create(
-    category: int = Form(...),
-    name: str = Form(...),
-    slug: str = Form(...),
-    price: float = Form(...),
-    description: str = Form(...),
-    image: UploadFile = File(...),
-    db: Session = Depends(get_db)
-) -> ProductInDB:
-    product_data = ProductCreate(
-        category=category,
-        name=name,
-        slug=slug,
-        price=price,
-        description=description
-    )
-    product_data.image = await handle_file_upload(image)
-
-    return await create_product(db, product_data)
-
-# async def product_create(product: ProductCreate, db: Session = Depends(get_db)) -> ProductInDB:
-#     return await create_product(db, product)
+async def product_create(category: int = Form(...),
+                         name: str = Form(...),
+                         slug: str = Form(...),
+                         price: float = Form(...),
+                         description: str = Form(...),
+                         image: UploadFile = File(...)
+                         ) -> ProductInDB:
+    product = ProductCreate(category=category,
+                            name=name,
+                            slug=slug,
+                            price=price,
+                            description=description)
+    image_, thumb_image = await handle_file_upload(image)
+    product.image = image_
+    product.thumbnail = thumb_image
+    return ProductInDB(id=10, **product.dict())
