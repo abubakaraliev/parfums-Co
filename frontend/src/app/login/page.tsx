@@ -1,8 +1,9 @@
-import React from 'react';
-import LoginForm from '../libs/loginForm';
+"use client"
+import React from 'react'
+import LoginForm from '../../components/forms/loginForm';
 
-export default function LoginPage() {
+export default function Login() {
   return (
     <LoginForm />
-  );
+  )
 }

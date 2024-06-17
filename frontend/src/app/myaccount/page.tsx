@@ -1,8 +1,9 @@
+"use client";
 import React from 'react'
-import Profile from '../libs/profileUser'
+import MyAccountForm from '../../components/forms/myaccountForm'
 
-export default function myAccountPage() {
-    return (
-        <Profile />
-    )
+export default function myAccount() {
+  return (
+    <MyAccountForm />
+  )
 }

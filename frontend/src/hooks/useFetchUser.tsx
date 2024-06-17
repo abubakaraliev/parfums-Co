@@ -30,4 +30,17 @@ const loginUser = async (userData: { username: string; password: string }) => {
   }
 };
 
-export { registerUser, loginUser };
+// get all users
+const getAllUsers = async () => {
+  try {
+    const response = await axios.get(
+      "http://127.0.0.1:8000/users/all"
+    );
+    return response;
+  } catch (error) {
+    console.log("Failed to get all users", error);
+    throw error;
+  }
+};
+
+export { registerUser, loginUser, getAllUsers };

@@ -1,13 +1,15 @@
-from fastapi import APIRouter, Depends, File, Form, UploadFile
-
-from app.database import get_db
-from product.crud import create_category, create_product
-from app.helpers import handle_file_upload
-from ..schemas import CategoryInDB, CategoryCreate, ProductCreate, ProductInDB
+from typing import List
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 from sqlalchemy.orm import Session
+from app.database import SessionLocal, get_db
+from product.crud import create_product, delete_product_by_id
+from app.helpers import handle_file_upload
 from users import check_if_user_is_admin
+from product.models import Product
+from ..schemas import CategoryInDB, CategoryCreate, ProductCreate, ProductInDB
 
 router = APIRouter()
+
 
 @router.post(
     "/category/create",
@@ -16,8 +18,9 @@ router = APIRouter()
     response_model=CategoryInDB,
     dependencies=[Depends(check_if_user_is_admin)]
 )
-async def category_create(category: CategoryCreate, db: Session = Depends(get_db)) -> CategoryInDB:
-    return await create_category(db, category)
+def category_create(category: CategoryCreate) -> CategoryInDB:
+    from product.crud import create_category
+    return create_category(category)
 
 
 @router.post(
@@ -27,19 +30,59 @@ async def category_create(category: CategoryCreate, db: Session = Depends(get_db
     response_model=ProductInDB,
     dependencies=[Depends(check_if_user_is_admin)]
 )
-async def product_create(category: int = Form(...),
-                         name: str = Form(...),
-                         slug: str = Form(...),
-                         price: float = Form(...),
-                         description: str = Form(...),
-                         image: UploadFile = File(...)
-                         ) -> ProductInDB:
-    product = ProductCreate(category=category,
-                            name=name,
-                            slug=slug,
-                            price=price,
-                            description=description)
-    image_, thumb_image = await handle_file_upload(image)
-    product.image = image_
-    product.thumbnail = thumb_image
-    return ProductInDB(id=10, **product.dict())
+async def product_create(
+    category: int = Form(...),
+    name: str = Form(...),
+    slug: str = Form(...),
+    price: float = Form(...),
+    description: str = Form(...),
+    image: UploadFile = File(...),
+    db: Session = Depends(get_db)
+) -> ProductInDB:
+
+    try:
+        image_path, thumbnail_path = await handle_file_upload(image)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    product_data = ProductCreate(
+        category=category,
+        name=name,
+        slug=slug,
+        price=price,
+        description=description,
+        image=image_path,
+        thumbnail=thumbnail_path
+    )
+
+    created_product = create_product(db, product_data)
+
+    return created_product
+
+
+@router.get("/all",
+            tags=["get products"],
+            description="Get all products",
+            response_model=List[ProductInDB])
+def get_all_products() -> List[ProductInDB]:
+    db = SessionLocal()
+    try:
+        products = db.query(Product).all()
+        return products
+    finally:
+        db.close()
+
+
+@router.delete("/delete/{product_id}",
+               tags=["delete product"],
+               description="Delete product by ID",
+               dependencies=[Depends(check_if_user_is_admin)])
+def delete_product(product_id: int, db: Session = Depends(get_db)):
+    product = db.query(Product).get(product_id)
+    if product is None:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    delete_product_by_id(product_id, db)
+    
+    return {"message": "Product deleted successfully"}
+

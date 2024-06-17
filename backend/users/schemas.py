@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 import string
-from pydantic import EmailStr, constr, validator
+from pydantic import EmailStr, validator
 from app.schemas import CoreModel, DateTimeModelMixin, IDModelMixin
 from typing import Optional
 from app.core.config import settings
@@ -64,6 +64,14 @@ class UserCreate(CoreModel):
         elif len(password) > 100:
             raise ValueError("Password length cannot exceed 100 characters")
         return password
+
+    class Config:
+        orm_mode = True
+        
+class UserUpdate(CoreModel):
+    email: Optional[EmailStr]
+    password: Optional[str]
+    username: Optional[str]
 
     class Config:
         orm_mode = True

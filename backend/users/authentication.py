@@ -4,11 +4,11 @@ from typing import Optional
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import ValidationError
 from app.core.config import settings
-from passlib.context import CryptContext  # type: ignore
 from .schemas import JWTCreds, JWTMeta, JWTPayload, TokenData, UserInDB, UserPasswordUpdate
-import bcrypt  # type: ignore
-import jwt
+from passlib.context import CryptContext
 from jwt import ExpiredSignatureError, PyJWTError
+import bcrypt
+import jwt
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")

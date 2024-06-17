@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Unicode, DateTime, Boolean
+from sqlalchemy import Column, String, DateTime, Boolean, func
 from app.database import Base
 
 
@@ -13,5 +13,5 @@ class User(Base):
     password = Column(String(length=255), nullable=False)
     is_active = Column(Boolean, nullable=False, default=True)
     is_superuser = Column(Boolean, nullable=False, default=False)
-    created_at = Column(DateTime, nullable=False)
-    updated_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, default=func.now(), nullable=False)
+    updated_at = Column(DateTime, default=func.now(), onupdate=func.now(), nullable=False)
